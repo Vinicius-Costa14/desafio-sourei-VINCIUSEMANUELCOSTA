@@ -14,7 +14,8 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^17.2.0",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "prisma": "^6.11.1"
   },
   "compilerOptions": {
     "target": "es2019",
