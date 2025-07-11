@@ -11,6 +11,11 @@ export class PrismaProductRepository implements ProductRepository {
         //return products.map(p => new Product(p.id, p.name, p.price, p.quantity));
         return products;
     }
+      async findById(id: string): Promise<Product | null> {
+        const p = await prisma.product.findUnique({ where: { id } });
+        // return p ? new Product(p.id, p.name, p.price) : null;
+        return p;
+    }
     async create(product: Omit<Product, 'id'>): Promise<Product> {
         const created = await prisma.product.create({
         data: {
