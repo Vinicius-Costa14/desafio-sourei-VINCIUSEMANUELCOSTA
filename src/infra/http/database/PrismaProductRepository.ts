@@ -18,12 +18,22 @@ export class PrismaProductRepository implements ProductRepository {
     }
     async create(product: Omit<Product, 'id'>): Promise<Product> {
         const created = await prisma.product.create({
-        data: {
-            name: product.name,
-            price: product.price,
-            quantity: product.quantity || 0,
-        }
+            data: {
+                name: product.name,
+                price: product.price,
+                quantity: product.quantity || 0,
+            }
         });
         return new Product(created.id, created.name, created.price, created.quantity);
-  }
+    }
+    async update(product: Product): Promise<Product> {
+        const updated = await prisma.product.update({
+            where: { id: product.id },
+            data: { name: product.name, price: product.price, quantity: product.quantity },
+        });
+        return new Product(updated.id, updated.name, updated.price, updated.quantity);
+    }
+    async delete(id: string): Promise<void> {
+        await prisma.product.delete({ where: { id } });
+    }
 }
