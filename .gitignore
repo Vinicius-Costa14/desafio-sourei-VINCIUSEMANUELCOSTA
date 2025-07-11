@@ -46,3 +46,5 @@ pids/
 
 # Misc
 *.tgz
+
+/src/generated/prisma
