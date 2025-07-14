@@ -12,3 +12,18 @@ services:
       - "3306:3306"
     volumes:
       - ./mysql_data:/var/lib/mysql
+
+  api:
+    image: desafio-crud-api
+    container_name: desafio-crud-api
+    restart: always
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=mysql://user:senha123@mysql:3306/produtos
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+  

@@ -1,0 +1,11 @@
+node_modules
+.git
+.vscode
+mysql_data
+dist
+.env
+.env.*
+*.log
+Dockerfile
+docker-compose.yml
+README.md
