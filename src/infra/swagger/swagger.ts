@@ -11,8 +11,9 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3005',
-        description: 'Servidor de desenvolvimento',
+        // url: 'http://localhost:3005',
+        url: 'https://desafio-sourei-vinciusemanuelcosta-production.up.railway.app/api-docs/#/API%20Key/post_apikey_generate',
+        description: '',
       },
     ],
     components: {
