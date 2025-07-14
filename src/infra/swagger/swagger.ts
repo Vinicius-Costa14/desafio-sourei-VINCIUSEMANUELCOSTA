@@ -7,7 +7,7 @@ const options = {
     info: {
       title: 'Products API',
       version: '1.0.0',
-      description: 'API para gerenciamento de produtos',
+      description: 'API para gerenciamento de produtos com autenticação por API Key',
     },
     servers: [
       {
@@ -16,6 +16,14 @@ const options = {
       },
     ],
     components: {
+      securitySchemes: {
+        ApiKeyAuth: {
+          type: 'apiKey',
+          in: 'header',
+          name: 'X-API-Key',
+          description: 'API Key necessária para acessar endpoints protegidos'
+        }
+      },
       schemas: {
         Product: {
           type: 'object',
@@ -84,6 +92,67 @@ const options = {
             },
           },
         },
+        ApiKey: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'ID único da API key',
+              example: 'uuid-456',
+            },
+            key: {
+              type: 'string',
+              description: 'A chave de API gerada',
+              example: 'abc123xyz789def456',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Data de criação da API key',
+              example: '2024-01-15T10:30:00Z',
+            },
+            owner: {
+              type: 'string',
+              description: 'Proprietário da API key (opcional)',
+              example: 'usuario@email.com',
+            },
+            active: {
+              type: 'boolean',
+              description: 'Status da API key (ativa/inativa)',
+              example: true,
+            },
+          },
+        },
+        CreateApiKeyRequest: {
+          type: 'object',
+          properties: {
+            owner: {
+              type: 'string',
+              description: 'Proprietário da API key (opcional)',
+              example: 'usuario@email.com',
+            },
+          },
+        },
+        CreateApiKeyResponse: {
+          type: 'object',
+          properties: {
+            apiKey: {
+              type: 'string',
+              description: 'A chave de API gerada',
+              example: 'abc123xyz789def456',
+            },
+            owner: {
+              type: 'string',
+              description: 'Proprietário da API key',
+              example: 'usuario@email.com',
+            },
+            active: {
+              type: 'boolean',
+              description: 'Status da API key',
+              example: true,
+            },
+          },
+        },
         Error: {
           type: 'object',
           properties: {
@@ -94,9 +163,58 @@ const options = {
             },
           },
         },
+        UnauthorizedError: {
+          type: 'object',
+          properties: {
+            error: {
+              type: 'string',
+              description: 'Erro de autenticação',
+              example: 'API Key inválida ou não fornecida',
+            },
+          },
+        },
       },
     },
     paths: {
+      '/apikey/generate': {
+        post: {
+          tags: ['API Key'],
+          summary: 'Gera uma nova API Key',
+          description: 'Cria uma nova API key para autenticação nos endpoints protegidos',
+          requestBody: {
+            required: false,
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/CreateApiKeyRequest',
+                },
+              },
+            },
+          },
+          responses: {
+            '201': {
+              description: 'API Key criada com sucesso',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/CreateApiKeyResponse',
+                  },
+                },
+              },
+            },
+            '500': {
+              description: 'Erro interno do servidor',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/Error',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       '/products': {
         get: {
           tags: ['Products'],
@@ -121,7 +239,12 @@ const options = {
         post: {
           tags: ['Products'],
           summary: 'Cria um novo produto',
-          description: 'Cria um novo produto com os dados fornecidos',
+          description: 'Cria um novo produto com os dados fornecidos. **Requer autenticação por API Key.**',
+          security: [
+            {
+              ApiKeyAuth: []
+            }
+          ],
           requestBody: {
             required: true,
             content: {
@@ -149,6 +272,16 @@ const options = {
                 'application/json': {
                   schema: {
                     $ref: '#/components/schemas/Error',
+                  },
+                },
+              },
+            },
+            '401': {
+              description: 'API Key inválida ou não fornecida',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/UnauthorizedError',
                   },
                 },
               },
@@ -204,7 +337,12 @@ const options = {
         put: {
           tags: ['Products'],
           summary: 'Atualiza um produto',
-          description: 'Atualiza um produto existente com os dados fornecidos',
+          description: 'Atualiza um produto existente com os dados fornecidos. **Requer autenticação por API Key.**',
+          security: [
+            {
+              ApiKeyAuth: []
+            }
+          ],
           parameters: [
             {
               name: 'id',
@@ -237,6 +375,16 @@ const options = {
                 },
               },
             },
+            '401': {
+              description: 'API Key inválida ou não fornecida',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/UnauthorizedError',
+                  },
+                },
+              },
+            },
             '404': {
               description: 'Produto não encontrado',
               content: {
@@ -252,7 +400,12 @@ const options = {
         delete: {
           tags: ['Products'],
           summary: 'Remove um produto',
-          description: 'Remove um produto específico baseado no ID fornecido',
+          description: 'Remove um produto específico baseado no ID fornecido. **Requer autenticação por API Key.**',
+          security: [
+            {
+              ApiKeyAuth: []
+            }
+          ],
           parameters: [
             {
               name: 'id',
@@ -267,6 +420,16 @@ const options = {
           responses: {
             '204': {
               description: 'Produto removido com sucesso',
+            },
+            '401': {
+              description: 'API Key inválida ou não fornecida',
+              content: {
+                'application/json': {
+                  schema: {
+                    $ref: '#/components/schemas/UnauthorizedError',
+                  },
+                },
+              },
             },
             '404': {
               description: 'Produto não encontrado',
