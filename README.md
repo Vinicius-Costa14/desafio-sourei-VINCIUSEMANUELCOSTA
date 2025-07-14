@@ -223,7 +223,7 @@ Acesse **http://localhost:3005/api-docs** :
 - [ ] Adicionar testes automatizados unitários, integração, end to end: vitest
 - [ ] Implementar paginação
 - [ ] Adicionar filtros de busca
-- [ ] Adicionar bibliotecas de segurança: helmet, cors
+- [ ] Adicionar bibliotecas de segurança: helmet
 - [ ] Avaliar migração para framework: Nest.js
 
 ---
